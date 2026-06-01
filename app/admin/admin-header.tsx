@@ -8,8 +8,16 @@ export default function AdminHeader({ active }: { active: "orders" | "haulers" }
     <header className="bg-navy text-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
         <div className="flex items-center gap-5">
-          <span className="font-display text-sm font-extrabold uppercase tracking-widest text-yellow">
-            Midwest Waste · Admin
+          <span className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-mark.svg"
+              alt="Midwest Waste"
+              className="h-7 w-7 rounded ring-1 ring-white/25"
+            />
+            <span className="font-display text-sm font-extrabold uppercase tracking-widest text-yellow">
+              Midwest Waste · Admin
+            </span>
           </span>
           <nav className="flex gap-1">
             <a href="/admin" className={tabClass(active === "orders")}>

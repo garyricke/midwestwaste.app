@@ -14,8 +14,16 @@ export default async function Home() {
       {/* Header */}
       <header className="bg-navy text-white">
         <div className="mx-auto max-w-3xl px-5 py-4 flex items-center justify-between">
-          <span className="font-display font-extrabold text-xl tracking-tight">
-            MIDWEST WASTE
+          <span className="flex items-center gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-mark.svg"
+              alt="Midwest Waste"
+              className="h-9 w-9 rounded-md ring-1 ring-white/25"
+            />
+            <span className="font-display font-extrabold text-xl tracking-tight">
+              MIDWEST WASTE
+            </span>
           </span>
           <span className="hidden sm:block text-sm text-white/70">
             Family-owned · 30 years · Talk to a human

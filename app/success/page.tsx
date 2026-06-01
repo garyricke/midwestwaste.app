@@ -31,8 +31,16 @@ export default async function SuccessPage({
     <main className="flex-1">
       <header className="bg-navy text-white">
         <div className="mx-auto max-w-3xl px-5 py-4">
-          <Link href="/" className="font-display font-extrabold text-xl tracking-tight">
-            MIDWEST WASTE
+          <Link href="/" className="flex items-center gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-mark.svg"
+              alt="Midwest Waste"
+              className="h-9 w-9 rounded-md ring-1 ring-white/25"
+            />
+            <span className="font-display font-extrabold text-xl tracking-tight">
+              MIDWEST WASTE
+            </span>
           </Link>
         </div>
       </header>
