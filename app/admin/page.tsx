@@ -1,8 +1,11 @@
 import { isAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { assignHauler } from "@/lib/haulers-actions";
 import type { Order } from "@/lib/types";
 import AdminLogin from "./admin-login";
 import AdminHeader from "./admin-header";
+
+type HaulerOption = { id: string; name: string; city: string | null };
 
 export const dynamic = "force-dynamic";
 
@@ -39,9 +42,9 @@ function when(iso: string) {
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; status?: string }>;
+  searchParams: Promise<{ error?: string; status?: string; assigned?: string }>;
 }) {
-  const { error, status } = await searchParams;
+  const { error, status, assigned } = await searchParams;
 
   if (!(await isAdmin())) {
     return <AdminLogin error={error === "1"} />;
@@ -54,13 +57,16 @@ export default async function AdminPage({
       .select("*")
       .order("created_at", { ascending: false })
       .limit(300),
-    supabaseAdmin.from("haulers").select("id,name,contact_email,contact_phone"),
+    supabaseAdmin.from("haulers").select("id,name,contact_email,contact_phone,city,active"),
   ]);
   const orders = (ordersRes.data ?? []) as Order[];
 
   const haulerMap: Record<string, { name: string; email: string; phone: string | null }> = {};
-  for (const h of haulersRes.data ?? [])
+  const activeHaulers: HaulerOption[] = [];
+  for (const h of haulersRes.data ?? []) {
     haulerMap[h.id] = { name: h.name, email: h.contact_email, phone: h.contact_phone };
+    if (h.active) activeHaulers.push({ id: h.id, name: h.name, city: h.city });
+  }
 
   // Counts for the summary + filter badges.
   const counts: Record<string, number> = {};
@@ -77,6 +83,11 @@ export default async function AdminPage({
       <AdminHeader active="orders" />
 
       <div className="mx-auto max-w-6xl px-5 py-6">
+        {assigned && (
+          <p className="mb-4 rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700">
+            Hauler assigned and notified by email.
+          </p>
+        )}
         {/* Summary */}
         <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Stat label="Orders" value={String(orders.length)} />
@@ -182,6 +193,9 @@ export default async function AdminPage({
                       ) : (
                         <span className="text-foreground/40">—</span>
                       )}
+                      {o.status !== "pending_payment" && o.status !== "failed" && (
+                        <AssignControl order={o} haulers={activeHaulers} />
+                      )}
                     </Td>
                   </tr>
                 );
@@ -212,6 +226,44 @@ function Stat({ label, value, alert }: { label: string; value: string; alert?: b
         {value}
       </div>
     </div>
+  );
+}
+
+function AssignControl({
+  order,
+  haulers,
+}: {
+  order: Order;
+  haulers: HaulerOption[];
+}) {
+  const needsAssignment = order.status === "needs_manual_assignment";
+  return (
+    <form action={assignHauler} className="mt-2 flex flex-wrap items-center gap-1">
+      <input type="hidden" name="order_id" value={order.id} />
+      <select
+        name="hauler_id"
+        defaultValue={order.assigned_hauler_id ?? ""}
+        required
+        className="max-w-[11rem] rounded-md border border-black/15 px-2 py-1 text-xs"
+      >
+        <option value="" disabled>
+          Choose hauler…
+        </option>
+        {haulers.map((h) => (
+          <option key={h.id} value={h.id}>
+            {h.name}
+            {h.city ? ` — ${h.city}` : ""}
+          </option>
+        ))}
+      </select>
+      <button
+        className={`rounded-md px-2 py-1 text-xs font-semibold text-white ${
+          needsAssignment ? "bg-orange hover:bg-orange-deep" : "bg-navy hover:bg-navy-deep"
+        }`}
+      >
+        {needsAssignment ? "Assign" : "Reassign"}
+      </button>
+    </form>
   );
 }
 

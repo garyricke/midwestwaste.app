@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase";
 import { geocodeZip } from "@/lib/geocode";
 import { isAdmin } from "@/lib/admin-auth";
+import { haversineMiles } from "@/lib/matcher";
+import { sendHaulerAssignment } from "@/lib/email";
+import type { Hauler, Order } from "@/lib/types";
 
 type HaulerInput = {
   name: string;
@@ -104,6 +107,46 @@ export async function deleteHauler(fd: FormData) {
     revalidatePath("/admin/haulers");
   }
   redirect("/admin/haulers?deleted=1");
+}
+
+/** Manually assign (or reassign) a hauler to an order, then email them. */
+export async function assignHauler(fd: FormData) {
+  await requireAdmin();
+  const orderId = String(fd.get("order_id") || "");
+  const haulerId = String(fd.get("hauler_id") || "");
+  if (!orderId || !haulerId) redirect("/admin");
+
+  const [orderRes, haulerRes] = await Promise.all([
+    supabaseAdmin.from("orders").select("*").eq("id", orderId).maybeSingle(),
+    supabaseAdmin.from("haulers").select("*").eq("id", haulerId).maybeSingle(),
+  ]);
+  const order = orderRes.data as Order | null;
+  const hauler = haulerRes.data as Hauler | null;
+  if (!order || !hauler) redirect("/admin?error=assign");
+
+  const distance =
+    order.delivery_latitude != null && order.delivery_longitude != null
+      ? haversineMiles(order.delivery_latitude, order.delivery_longitude, hauler.latitude, hauler.longitude)
+      : null;
+
+  await supabaseAdmin
+    .from("orders")
+    .update({ assigned_hauler_id: hauler.id, distance_miles: distance, status: "notified" })
+    .eq("id", order.id);
+
+  try {
+    await sendHaulerAssignment(
+      { ...order, assigned_hauler_id: hauler.id, distance_miles: distance, status: "notified" },
+      hauler,
+      distance ?? 0
+    );
+  } catch {
+    // Email failed — leave assigned, admin can retry.
+    await supabaseAdmin.from("orders").update({ status: "assigned" }).eq("id", order.id);
+  }
+
+  revalidatePath("/admin");
+  redirect("/admin?assigned=1");
 }
 
 // ---- CSV bulk import --------------------------------------------------------

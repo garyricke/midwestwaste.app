@@ -24,7 +24,7 @@ export interface HaulerMatcher {
 
 const EARTH_RADIUS_MILES = 3958.8;
 
-function haversineMiles(
+export function haversineMiles(
   lat1: number,
   lon1: number,
   lat2: number,
