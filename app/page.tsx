@@ -33,14 +33,24 @@ export default async function Home() {
 
       {/* Hero */}
       <section className="bg-navy-deep text-white">
-        <div className="mx-auto max-w-3xl px-5 pb-10 pt-6">
-          <h1 className="font-display font-extrabold text-3xl sm:text-4xl leading-tight">
-            Order a dumpster in two minutes.
-          </h1>
-          <p className="mt-3 text-white/80 max-w-xl">
-            Pick your size, tell us where it&apos;s going, and we&apos;ll match
-            you with a trusted local hauler. No phone tag, no quotes to chase.
-          </p>
+        <div className="mx-auto max-w-3xl px-5 pb-10 pt-6 flex flex-col-reverse items-center gap-4 sm:flex-row sm:items-center sm:gap-6">
+          <div className="sm:flex-1">
+            <h1 className="font-display font-extrabold text-3xl sm:text-4xl leading-tight">
+              Order a dumpster in two minutes.
+            </h1>
+            <p className="mt-3 text-white/80 max-w-xl">
+              Pick your size, tell us where it&apos;s going, and we&apos;ll match
+              you with a trusted local hauler. No phone tag, no quotes to chase.
+            </p>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand-badge.png"
+            alt="Midwest Waste — Dumpster Rental"
+            width={176}
+            height={176}
+            className="w-32 shrink-0 sm:w-44"
+          />
         </div>
       </section>
 
