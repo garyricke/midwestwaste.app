@@ -18,6 +18,15 @@ const STATUS_STYLES: Record<string, string> = {
   failed: "bg-red-100 text-red-700",
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  pending_payment: "unpaid",
+  paid: "paid",
+  assigned: "assigned",
+  notified: "notified",
+  needs_manual_assignment: "needs assignment",
+  failed: "failed",
+};
+
 const FILTERS = [
   { key: "all", label: "All" },
   { key: "needs_manual_assignment", label: "Needs assignment" },
@@ -150,11 +159,11 @@ export default async function AdminPage({
                     <Td className="whitespace-nowrap">{when(o.created_at)}</Td>
                     <Td>
                       <span
-                        className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        className={`inline-block whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${
                           STATUS_STYLES[o.status] ?? "bg-gray-100 text-gray-600"
                         }`}
                       >
-                        {o.status.replace(/_/g, " ")}
+                        {STATUS_LABELS[o.status] ?? o.status.replace(/_/g, " ")}
                       </span>
                     </Td>
                     <Td>{o.dumpster_size}</Td>
@@ -178,21 +187,25 @@ export default async function AdminPage({
                         <div className="text-foreground/60">{o.customer_phone}</div>
                       )}
                     </Td>
-                    <Td>
+                    <Td className="min-w-[15rem]">
                       {h ? (
-                        <>
+                        <div className="space-y-0.5">
                           <div className="font-semibold">{h.name}</div>
                           {o.distance_miles != null && (
                             <div className="text-foreground/60">
                               {o.distance_miles.toFixed(1)} mi
-                              {o.status === "needs_manual_assignment" && " (out of range)"}
+                              {o.status === "needs_manual_assignment" && " — out of range"}
                             </div>
                           )}
                           <div className="text-xs text-foreground/50">{h.email}</div>
-                        </>
-                      ) : (
+                        </div>
+                      ) : o.status === "needs_manual_assignment" ? (
+                        <div className="text-xs font-medium text-red-600">
+                          No hauler in range — pick one:
+                        </div>
+                      ) : o.status === "pending_payment" || o.status === "failed" ? (
                         <span className="text-foreground/40">—</span>
-                      )}
+                      ) : null}
                       {o.status !== "pending_payment" && o.status !== "failed" && (
                         <AssignControl order={o} haulers={activeHaulers} />
                       )}
@@ -238,13 +251,13 @@ function AssignControl({
 }) {
   const needsAssignment = order.status === "needs_manual_assignment";
   return (
-    <form action={assignHauler} className="mt-2 flex flex-wrap items-center gap-1">
+    <form action={assignHauler} className="mt-2 flex items-center gap-1.5">
       <input type="hidden" name="order_id" value={order.id} />
       <select
         name="hauler_id"
         defaultValue={order.assigned_hauler_id ?? ""}
         required
-        className="max-w-[11rem] rounded-md border border-black/15 px-2 py-1 text-xs"
+        className="w-40 rounded-md border border-black/15 bg-white px-2 py-1.5 text-xs"
       >
         <option value="" disabled>
           Choose hauler…
@@ -257,7 +270,7 @@ function AssignControl({
         ))}
       </select>
       <button
-        className={`rounded-md px-2 py-1 text-xs font-semibold text-white ${
+        className={`shrink-0 rounded-md px-3 py-1.5 text-xs font-semibold text-white ${
           needsAssignment ? "bg-orange hover:bg-orange-deep" : "bg-navy hover:bg-navy-deep"
         }`}
       >
