@@ -11,9 +11,9 @@ export default function AdminHeader({ active }: { active: "orders" | "haulers" }
           <span className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo-mark.svg"
+              src="/logo-mark-white.png"
               alt="Midwest Waste"
-              className="h-7 w-7 rounded ring-1 ring-white/25"
+              className="h-8 w-auto"
             />
             <span className="font-display text-sm font-extrabold uppercase tracking-widest text-yellow">
               Midwest Waste · Admin

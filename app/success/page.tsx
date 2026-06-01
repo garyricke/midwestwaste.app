@@ -34,9 +34,9 @@ export default async function SuccessPage({
           <Link href="/" className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo-mark.svg"
+              src="/logo-mark-white.png"
               alt="Midwest Waste"
-              className="h-9 w-9 rounded-md ring-1 ring-white/25"
+              className="h-10 w-auto"
             />
             <span className="font-display font-extrabold text-xl tracking-tight">
               MIDWEST WASTE
