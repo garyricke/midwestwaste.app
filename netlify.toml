@@ -1,0 +1,23 @@
+# Netlify configuration — midwestwaste.app (transactional site)
+# Next.js runtime is auto-detected; the @netlify/plugin-nextjs handles build output.
+
+[build]
+  command = "next build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Pre-launch password gate — runs on every request before the app.
+# Bypasses /api/webhook internally so Stripe can reach it. Set GATE_DISABLED=true
+# (or remove this block) at go-live.
+[[edge_functions]]
+  function = "gate"
+  path = "/*"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"

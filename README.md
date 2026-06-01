@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# midwestwaste.app — transactional dumpster ordering (Phase 1)
 
-## Getting Started
+The transactional sister site to the consulting site (midwestwasteconsultants.com).
+A visitor picks a dumpster size, pays via Stripe, and the order is auto-routed to
+the **closest qualified hauler** from a Supabase database, who is then emailed.
 
-First, run the development server:
+This is the durable **Phase 1 engine** shipped behind a plain form. The Junkyard
+Jam cartoon UI (Phase 2) layers on top later — nothing here gets thrown away.
 
+## Stack
+- **Next.js (App Router) + TypeScript + Tailwind v4**
+- **Supabase** (Postgres) — haulers, orders, sizes
+- **Stripe Checkout** — payments (PCI offloaded)
+- **Resend** — transactional email
+- **Netlify** — hosting + pre-launch password gate (edge function)
+- **`zipcodes`** — offline US zip → lat/long (no API key, nationwide)
+
+## Order flow
+1. Form → `POST /api/checkout` creates a `pending_payment` order + Stripe Checkout Session.
+2. Stripe-hosted payment page.
+3. `checkout.session.completed` webhook → `POST /api/webhook`:
+   - idempotent (keyed on Stripe event id)
+   - mark `paid` → match nearest hauler (haversine) → assign + email hauler
+   - if no hauler in range → `needs_manual_assignment` + alert admin (the nationwide-growth signal)
+4. `/success` confirmation page.
+
+## Setup
 ```bash
+npm install
+cp .env.example .env.local   # fill in values
+# In Supabase SQL editor, run:
+#   supabase/schema.sql   (tables + sizes)
+#   supabase/seed.sql     (fake Fox Valley haulers — testing only)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Local Stripe webhook
+```bash
+stripe login
+stripe listen --forward-to localhost:3000/api/webhook
+# copy the whsec_… into STRIPE_WEBHOOK_SECRET
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How to add a real hauler
+Insert a row into `haulers` (Supabase table editor or SQL). Required: `name`,
+`contact_email`, `latitude`, `longitude`, `service_radius_miles`. Geocode the
+hauler's address once (any geocoder, or `zipcodes.lookup(zip)` for a zip
+centroid). Set `active = true`. Then **blank out `HAULER_NOTIFY_OVERRIDE`** so
+assignment emails go to real haulers instead of Gary's inbox.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Going live
+- Swap `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` from test → live.
+- Set `NEXT_PUBLIC_SITE_URL=https://midwestwaste.app`.
+- Point Cloudflare DNS at the Netlify site.
+- Set `GATE_DISABLED=true` (or remove the gate edge function) to open the doors.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Swapping the matcher (later)
+`lib/matcher.ts` defines a `HaulerMatcher` interface. The current
+`HaversineMatcher` uses straight-line distance over our own DB (no per-order API
+call → scales without a rate ceiling). Replace with a `DistanceMatrixMatcher`
+(Google driving distance) later without touching callers.
