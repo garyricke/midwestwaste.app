@@ -8,8 +8,10 @@ const DISABLED = (Netlify.env.get("GATE_DISABLED") || "") === "true";
 const COOKIE_NAME = "mwa_unlock";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
-// Paths that must NEVER be gated (machine callers that can't enter a password).
-const BYPASS_PREFIXES = ["/api/webhook"];
+// Paths that must NEVER be gated (machine callers that can't enter a password,
+// and brand images hotlinked from transactional emails so they render even
+// while the site is gated).
+const BYPASS_PREFIXES = ["/api/webhook", "/brand-badge-navy.png"];
 
 const gateHtml = (error = "") => `<!doctype html>
 <html lang="en">

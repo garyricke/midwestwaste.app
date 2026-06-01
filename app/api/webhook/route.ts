@@ -3,7 +3,7 @@ import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase";
 import { matcher } from "@/lib/matcher";
-import { sendHaulerAssignment, sendNoHaulerAlert } from "@/lib/email";
+import { sendHaulerAssignment, sendNoHaulerAlert, sendCustomerConfirmation } from "@/lib/email";
 import type { Hauler, Order } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -65,6 +65,13 @@ async function fulfillOrder(session: Stripe.Checkout.Session) {
     return;
   }
   const order = orderRow as Order;
+
+  // Confirmation to the customer (independent of hauler matching).
+  try {
+    await sendCustomerConfirmation(order);
+  } catch (err) {
+    console.error("[webhook] customer confirmation email failed", err);
+  }
 
   // No delivery coordinates (unknown zip) => can't match.
   if (order.delivery_latitude == null || order.delivery_longitude == null) {
