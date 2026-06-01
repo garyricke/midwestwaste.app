@@ -2,6 +2,7 @@ import { isAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import type { Order } from "@/lib/types";
 import AdminLogin from "./admin-login";
+import AdminHeader from "./admin-header";
 
 export const dynamic = "force-dynamic";
 
@@ -80,21 +81,7 @@ export default async function AdminPage({
 
   return (
     <main className="flex-1">
-      <header className="bg-navy text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <div>
-            <span className="font-display text-xs font-bold uppercase tracking-widest text-yellow">
-              Admin
-            </span>
-            <h1 className="font-display text-xl font-extrabold">Orders</h1>
-          </div>
-          <form method="POST" action="/api/admin/logout">
-            <button className="rounded-lg border border-white/30 px-3 py-1.5 text-sm hover:bg-white/10">
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
+      <AdminHeader active="orders" />
 
       <div className="mx-auto max-w-6xl px-5 py-6">
         {/* Summary */}
