@@ -13,7 +13,9 @@ function resendClient(): Resend {
 }
 
 const FROM = process.env.EMAIL_FROM ?? "Midwest Waste <orders@midwestwaste.app>";
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://midwestwaste.app";
+// Logo hosted on Cloudinary (CDN, gate-independent, reliable in email clients).
+const LOGO_URL =
+  "https://res.cloudinary.com/dsbllwpbh/image/upload/f_auto,q_auto,w_240/midwest-waste/brand/gon3rlvealzj9egcrdcn";
 // During testing, hauler notifications route here instead of the (fake) hauler
 // address. Blank this out once real haulers are loaded.
 const NOTIFY_OVERRIDE = process.env.HAULER_NOTIFY_OVERRIDE || "";
@@ -42,8 +44,8 @@ function layout(preheader: string, heading: string, bodyHtml: string): string {
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f8fa;padding:24px 12px;">
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(20,40,73,0.08);">
-        <tr><td style="background:#1B365D;padding:22px;text-align:center;">
-          <img src="${SITE}/brand-badge-navy.png" alt="Midwest Waste — Dumpster Rental" width="104" height="104" style="display:inline-block;border:0;border-radius:10px;" />
+        <tr><td style="background:#ffffff;padding:24px 22px 20px;text-align:center;border-bottom:3px solid #FF8200;">
+          <img src="${LOGO_URL}" alt="Midwest Waste — Dumpster Rental" width="120" height="120" style="display:inline-block;border:0;border-radius:10px;" />
         </td></tr>
         <tr><td style="padding:28px 28px 8px;">
           <h1 style="margin:0 0 14px;font-size:20px;line-height:1.3;color:#1B365D;">${esc(heading)}</h1>
