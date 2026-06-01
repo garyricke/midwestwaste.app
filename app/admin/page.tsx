@@ -47,27 +47,20 @@ export default async function AdminPage({
     return <AdminLogin error={error === "1"} />;
   }
 
-  // Pull recent orders.
-  const { data: orderRows } = await supabaseAdmin
-    .from("orders")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(300);
-  const orders = (orderRows ?? []) as Order[];
+  // Fetch orders + haulers in parallel (haulers table is tiny).
+  const [ordersRes, haulersRes] = await Promise.all([
+    supabaseAdmin
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(300),
+    supabaseAdmin.from("haulers").select("id,name,contact_email,contact_phone"),
+  ]);
+  const orders = (ordersRes.data ?? []) as Order[];
 
-  // Map assigned hauler ids -> contact info.
-  const haulerIds = [
-    ...new Set(orders.map((o) => o.assigned_hauler_id).filter(Boolean)),
-  ] as string[];
   const haulerMap: Record<string, { name: string; email: string; phone: string | null }> = {};
-  if (haulerIds.length) {
-    const { data: hs } = await supabaseAdmin
-      .from("haulers")
-      .select("id,name,contact_email,contact_phone")
-      .in("id", haulerIds);
-    for (const h of hs ?? [])
-      haulerMap[h.id] = { name: h.name, email: h.contact_email, phone: h.contact_phone };
-  }
+  for (const h of haulersRes.data ?? [])
+    haulerMap[h.id] = { name: h.name, email: h.contact_email, phone: h.contact_phone };
 
   // Counts for the summary + filter badges.
   const counts: Record<string, number> = {};

@@ -25,19 +25,21 @@ export default async function HaulersPage({
         ? "Hauler deleted."
         : null;
 
-  const { data: haulerRows } = await supabaseAdmin
-    .from("haulers")
-    .select("*")
-    .order("state", { ascending: true })
-    .order("city", { ascending: true })
-    .order("name", { ascending: true });
-  const haulers = (haulerRows ?? []) as Hauler[];
-
-  // Count assigned orders per hauler.
-  const { data: assigned } = await supabaseAdmin
-    .from("orders")
-    .select("assigned_hauler_id")
-    .not("assigned_hauler_id", "is", null);
+  // Fetch haulers + assigned-order counts in parallel (independent queries).
+  const [haulersRes, assignedRes] = await Promise.all([
+    supabaseAdmin
+      .from("haulers")
+      .select("*")
+      .order("state", { ascending: true })
+      .order("city", { ascending: true })
+      .order("name", { ascending: true }),
+    supabaseAdmin
+      .from("orders")
+      .select("assigned_hauler_id")
+      .not("assigned_hauler_id", "is", null),
+  ]);
+  const haulers = (haulersRes.data ?? []) as Hauler[];
+  const assigned = assignedRes.data;
   const orderCounts: Record<string, number> = {};
   for (const r of assigned ?? []) {
     const id = (r as { assigned_hauler_id: string }).assigned_hauler_id;
