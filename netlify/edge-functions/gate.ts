@@ -55,6 +55,9 @@ const gateHtml = (error = "") => `<!doctype html>
   input::placeholder { color: rgba(255,255,255,0.45); }
   button { padding: 12px 22px; border-radius: 999px; background: #FF8200; color: #142849; border: 0; font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 0.92rem; letter-spacing: 0.04em; cursor: pointer; transition: transform 200ms ease, background 200ms ease; }
   button:hover { background: #ffffff; transform: translateY(-1px); }
+  button:disabled { opacity: 0.7; cursor: progress; }
+  form.loading .field { opacity: 0.85; }
+  form.loading input { pointer-events: none; }
   .err { min-height: 1.4em; font-size: 0.86rem; color: #ffc7c7; padding-left: 4px; }
   .foot { margin-top: 26px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.12); font-family: "Montserrat", sans-serif; font-size: 0.72rem; color: rgba(255,255,255,0.55); line-height: 1.5; letter-spacing: 0.04em; text-transform: uppercase; }
 </style>
@@ -64,7 +67,8 @@ const gateHtml = (error = "") => `<!doctype html>
     <span class="brand">Midwest Waste · Online Ordering</span>
     <h1>Almost ready.</h1>
     <p class="sub">Our online dumpster ordering is in private preview. Enter the access phrase to continue.</p>
-    <form method="POST" action="/_gate" autocomplete="off">
+    <form method="POST" action="/_gate" autocomplete="off"
+      onsubmit="var b=this.querySelector('button');b.textContent='Unlocking…';this.classList.add('loading');setTimeout(function(){b.disabled=true;},10);">
       <label for="pw">Access phrase</label>
       <div class="field">
         <input id="pw" type="password" name="password" autofocus required placeholder="••••••••••" />

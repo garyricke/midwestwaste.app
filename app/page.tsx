@@ -1,7 +1,10 @@
 import { getDumpsterSizes } from "@/lib/sizes";
 import OrderForm from "./order-form";
 
-export const dynamic = "force-dynamic";
+// Dumpster sizes are near-static config — cache the landing page and revalidate
+// periodically so it serves instantly from CDN instead of a full SSR + DB hit
+// (and cold start) on every visit.
+export const revalidate = 600;
 
 export default async function Home() {
   const sizes = await getDumpsterSizes();
