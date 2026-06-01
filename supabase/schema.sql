@@ -94,3 +94,15 @@ on conflict (size) do update set
   description = excluded.description,
   price_cents = excluded.price_cents,
   sort_order = excluded.sort_order;
+
+-- ---------------------------------------------------------------------------
+-- Grants: this app accesses these tables ONLY server-side via the service_role
+-- (secret) key. We deliberately do NOT grant anon/authenticated, so customer
+-- PII stays private even via the public API. Needed because the project was
+-- created with "automatically expose new tables" disabled.
+-- ---------------------------------------------------------------------------
+grant usage on schema public to service_role;
+grant all privileges on all tables in schema public to service_role;
+grant all privileges on all sequences in schema public to service_role;
+alter default privileges in schema public grant all on tables to service_role;
+alter default privileges in schema public grant all on sequences to service_role;
