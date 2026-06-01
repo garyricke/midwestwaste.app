@@ -1,16 +1,19 @@
--- Midwest Waste .app — FAKE hauler seed data (Fox Valley, WI)
--- Placeholder data for testing the matching engine. Replace with real haulers
--- before go-live. Coordinates are real town centroids so distance math is sane.
+-- Midwest Waste .app — placeholder hauler seed (Fox Valley, ILLINOIS)
 --
--- Nationwide note: these only cover the Fox Valley. An order outside ~50mi of
--- these points will (correctly) land in `needs_manual_assignment` — exercising
--- the no-local-hauler fallback workflow.
+-- These are REAL locally-owned dumpster/roll-off companies operating in the
+-- Illinois Fox Valley (Aurora / Sugar Grove / Batavia / St. Charles / Yorkville
+-- corridor, west of Chicago) — the area Midwest Waste serves. Company names and
+-- cities are real; CONTACT INFO IS FAKE on purpose (fake+slug@midwestwaste.app,
+-- 630-555-01xx) so testing never emails a real business. Replace with onboarded
+-- haulers + real contacts before go-live (or manage via /admin/haulers).
+--
+-- Coordinates are ZIP centroids so distance matching is realistic.
 
 insert into haulers (name, contact_email, contact_phone, address, city, state, zip, latitude, longitude, service_radius_miles) values
-  ('Bear Claw Hauling',     'fake+bearclaw@midwestwaste.app',  '920-555-0101', '100 Roll-Off Rd',   'Appleton',    'WI', '54911', 44.2773, -88.3976, 40),
-  ('Fox River Roll-Off',    'fake+foxriver@midwestwaste.app',  '920-555-0102', '22 Riverside Dr',   'Oshkosh',     'WI', '54901', 44.0247, -88.5426, 35),
-  ('Tundra Disposal',       'fake+tundra@midwestwaste.app',    '920-555-0103', '7 Glacier Way',     'Neenah',      'WI', '54956', 44.1858, -88.4626, 30),
-  ('Northwoods Container',  'fake+northwoods@midwestwaste.app','920-555-0104', '480 Pine St',       'Green Bay',   'WI', '54301', 44.5133, -88.0133, 45),
-  ('Valley Junk Co',        'fake+valleyjunk@midwestwaste.app','920-555-0105', '15 Depot Ave',      'Kaukauna',    'WI', '54130', 44.2780, -88.2746, 25),
-  ('Lakeside Waste',        'fake+lakeside@midwestwaste.app',  '920-555-0106', '900 Lakeshore Dr',  'Fond du Lac', 'WI', '54935', 43.7730, -88.4470, 40)
+  ('Dan''s Hauling Company',          'fake+danshauling@midwestwaste.app',  '630-555-0101', null, 'Batavia',       'IL', '60510', 41.8482, -88.3098, 30),
+  ('DDT Dumpster Rentals',            'fake+ddt@midwestwaste.app',          '630-555-0102', null, 'St. Charles',   'IL', '60174', 41.9194, -88.3070, 30),
+  ('Roadrunner Roll-Offs',            'fake+roadrunner@midwestwaste.app',   '630-555-0103', null, 'St. Charles',   'IL', '60174', 41.9194, -88.3070, 30),
+  ('Fox Valley Dumpster Rentals LLC', 'fake+foxvalley@midwestwaste.app',    '630-555-0104', null, 'Yorkville',     'IL', '60560', 41.6387, -88.4438, 25),
+  ('Dumpster Rental Pros of Aurora',  'fake+aurorapros@midwestwaste.app',   '630-555-0105', null, 'Aurora',        'IL', '60505', 41.7582, -88.2971, 25),
+  ('Junk Nurse',                      'fake+junknurse@midwestwaste.app',    '630-555-0106', null, 'Aurora',        'IL', '60506', 41.7664, -88.3446, 25)
 on conflict do nothing;
