@@ -9,13 +9,21 @@ export const dynamic = "force-dynamic";
 export default async function HaulersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; added?: string; updated?: string; deleted?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, added, updated, deleted } = await searchParams;
 
   if (!(await isAdmin())) {
     return <AdminLogin error={error === "1"} />;
   }
+
+  const banner = added
+    ? "Hauler added."
+    : updated
+      ? "Hauler updated."
+      : deleted
+        ? "Hauler deleted."
+        : null;
 
   const { data: haulerRows } = await supabaseAdmin
     .from("haulers")
@@ -43,10 +51,32 @@ export default async function HaulersPage({
       <AdminHeader active="haulers" />
 
       <div className="mx-auto max-w-6xl px-5 py-6">
-        <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <Stat label="Haulers" value={String(haulers.length)} />
-          <Stat label="Active" value={String(activeCount)} />
-          <Stat label="Inactive" value={String(haulers.length - activeCount)} />
+        {banner && (
+          <p className="mb-4 rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700">
+            {banner}
+          </p>
+        )}
+
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3">
+            <Stat label="Haulers" value={String(haulers.length)} />
+            <Stat label="Active" value={String(activeCount)} />
+            <Stat label="Inactive" value={String(haulers.length - activeCount)} />
+          </div>
+          <div className="flex gap-2">
+            <a
+              href="/admin/haulers/new"
+              className="rounded-lg bg-orange px-4 py-2 font-display font-bold text-white hover:bg-orange-deep"
+            >
+              + Add hauler
+            </a>
+            <a
+              href="/admin/haulers/import"
+              className="rounded-lg border border-navy/30 px-4 py-2 font-display font-bold text-navy hover:bg-navy/5"
+            >
+              Import CSV
+            </a>
+          </div>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-black/10 bg-white">
@@ -60,13 +90,14 @@ export default async function HaulersPage({
                 <Th>Radius</Th>
                 <Th>Orders</Th>
                 <Th>Status</Th>
+                <Th></Th>
               </tr>
             </thead>
             <tbody>
               {haulers.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-foreground/50">
-                    No haulers yet. Add rows to the <code>haulers</code> table.
+                  <td colSpan={8} className="px-4 py-8 text-center text-foreground/50">
+                    No haulers yet. Use “Add hauler” or “Import CSV” above.
                   </td>
                 </tr>
               )}
@@ -102,6 +133,14 @@ export default async function HaulersPage({
                       </span>
                     )}
                   </Td>
+                  <Td>
+                    <a
+                      href={`/admin/haulers/${h.id}/edit`}
+                      className="font-semibold text-navy hover:underline"
+                    >
+                      Edit
+                    </a>
+                  </Td>
                 </tr>
               ))}
             </tbody>
@@ -128,7 +167,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Th({ children }: { children: React.ReactNode }) {
+function Th({ children }: { children?: React.ReactNode }) {
   return <th className="px-4 py-3 font-semibold">{children}</th>;
 }
 function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
