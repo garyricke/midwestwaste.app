@@ -1,5 +1,6 @@
 import { getDumpsterSizes } from "@/lib/sizes";
 import OrderFlow from "./order-flow";
+import FaqSection from "./faq-section";
 
 // Dumpster sizes are near-static config — cache the landing page and revalidate
 // periodically so it serves instantly from CDN instead of a full SSR + DB hit
@@ -53,6 +54,9 @@ export default async function Home() {
 
       {/* Hero + size selector + order form (hero swaps with selected size) */}
       <OrderFlow sizes={sizes} />
+
+      {/* FAQ — helps customers choose + structured data for SEO/AI */}
+      <FaqSection />
 
       <footer className="mx-auto max-w-3xl px-5 py-8 text-sm text-foreground/60">
         Family-owned · 30 years strong · Questions? Call{" "}

@@ -14,9 +14,18 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Midwest Waste — Order a Dumpster",
+  title: "Midwest Waste — Roll-Off Dumpster Rental | Fox Valley, IL",
   description:
-    "Family-owned, 30 years strong. Order a dumpster online and we'll match you with a local hauler.",
+    "Order a 10, 15, 20, or 30 yard roll-off dumpster online in the Illinois Fox Valley — Aurora, Sugar Grove, Batavia, St. Charles, Naperville & nearby. Flat-rate pricing, fast local delivery. Family-owned, 30 years strong.",
+  keywords: [
+    "dumpster rental Fox Valley",
+    "roll-off dumpster Aurora IL",
+    "dumpster rental Sugar Grove",
+    "dumpster rental Batavia IL",
+    "dumpster rental Naperville",
+    "10 yard dumpster",
+    "20 yard dumpster rental",
+  ],
 };
 
 export default function RootLayout({

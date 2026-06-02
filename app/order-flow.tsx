@@ -55,7 +55,7 @@ export default function OrderFlow({ sizes }: { sizes: DumpsterSize[] }) {
                     key={s.size}
                     onClick={() => setSelected(s.size)}
                     aria-pressed={active}
-                    className={`rounded-xl border p-4 text-left backdrop-blur-md transition ${
+                    className={`cursor-pointer rounded-xl border p-4 text-left backdrop-blur-md transition ${
                       active
                         ? "border-orange bg-navy-deep/65 ring-2 ring-orange"
                         : "border-white/25 bg-navy-deep/35 hover:bg-navy-deep/50"
