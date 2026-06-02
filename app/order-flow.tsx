@@ -4,13 +4,12 @@ import { useState } from "react";
 import type { DumpsterSize } from "@/lib/types";
 import OrderForm from "./order-form";
 
-// Hero photo per dumpster size — becomes the background of the top section.
-const HERO: Record<string, string> = {
-  "10yd": "/hero/hero-10yd.jpg",
-  "15yd": "/hero/hero-15yd.jpg",
-  "20yd": "/hero/hero-20yd.jpg",
-  "30yd": "/hero/hero-30yd.jpg",
-};
+// Hero photos hosted on Cloudinary (auto format/quality, CDN, responsive).
+// Two crops per size: "wide" (3:2, desktop) and "tall" (9:16, mobile).
+const CLD = "https://res.cloudinary.com/dsbllwpbh/image/upload";
+const HERO_SIZES = ["10yd", "15yd", "20yd", "30yd"];
+const heroUrl = (size: string, variant: "wide" | "tall", w: number) =>
+  `${CLD}/f_auto,q_auto,w_${w}/midwest-waste/hero/${size}-${variant}`;
 
 // Approx pickup-truck loads each size holds (from the roll-off size guide).
 const TRUCK_LOADS: Record<string, number> = {
@@ -47,19 +46,22 @@ function TruckIcon() {
 
 export default function OrderFlow({ sizes }: { sizes: DumpsterSize[] }) {
   const [selected, setSelected] = useState<string>(sizes[0]?.size ?? "10yd");
-  const heroSrc = HERO[selected] ?? HERO["10yd"];
+  const heroSize = HERO_SIZES.includes(selected) ? selected : "10yd";
 
   return (
     <>
       {/* Hero: dumpster photo background + scrim + frosted size selector */}
       <section className="relative isolate overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          key={selected}
-          src={heroSrc}
-          alt={`Midwest Waste ${selected} roll-off dumpster`}
-          className="absolute inset-0 -z-20 h-full w-full object-cover"
-        />
+        {/* Responsive background: 9:16 portrait on mobile, 3:2 on desktop */}
+        <picture key={heroSize} className="absolute inset-0 -z-20 block h-full w-full">
+          <source media="(max-width: 640px)" srcSet={heroUrl(heroSize, "tall", 800)} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroUrl(heroSize, "wide", 1280)}
+            alt={`Midwest Waste ${selected} roll-off dumpster`}
+            className="h-full w-full object-cover"
+          />
+        </picture>
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-navy-deep/80 via-navy-deep/25 to-navy-deep/60" />
 
         <div className="mx-auto max-w-3xl px-5 py-16 text-white sm:py-24">
@@ -119,13 +121,21 @@ export default function OrderFlow({ sizes }: { sizes: DumpsterSize[] }) {
           </div>
         </div>
 
-        {/* Preload the other sizes so the background swap is instant */}
-        {Object.values(HERO)
-          .filter((src) => src !== heroSrc)
-          .map((src) => (
+        {/* Preload the other sizes (both crops) so the background swap is instant */}
+        {HERO_SIZES.filter((s) => s !== heroSize).flatMap((s) =>
+          (["wide", "tall"] as const).map((v) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} src={src} alt="" width={1} height={1} className="hidden" aria-hidden="true" />
-          ))}
+            <img
+              key={`${s}-${v}`}
+              src={heroUrl(s, v, v === "tall" ? 800 : 1280)}
+              alt=""
+              width={1}
+              height={1}
+              className="hidden"
+              aria-hidden="true"
+            />
+          ))
+        )}
       </section>
 
       {/* Delivery + contact + checkout */}
