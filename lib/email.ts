@@ -13,6 +13,9 @@ function resendClient(): Resend {
 }
 
 const FROM = process.env.EMAIL_FROM ?? "Midwest Waste <orders@midwestwaste.app>";
+// Hauler/dispatch notifications send from a distinct address.
+const HAULER_FROM =
+  process.env.HAULER_EMAIL_FROM ?? "Midwest Waste Dispatch <dispatch@midwestwaste.app>";
 // Logo hosted on Cloudinary (CDN, gate-independent, reliable in email clients).
 const LOGO_URL =
   "https://res.cloudinary.com/dsbllwpbh/image/upload/f_auto,q_auto,w_240/midwest-waste/brand/gon3rlvealzj9egcrdcn";
@@ -114,7 +117,7 @@ export async function sendHaulerAssignment(
     ]);
 
   await resendClient().emails.send({
-    from: FROM,
+    from: HAULER_FROM,
     to,
     subject: `New dumpster order — ${order.dumpster_size} for ${order.delivery_city ?? order.delivery_zip}`,
     html: layout("You've been matched to a new paid order.", "New order assigned to you", body),
@@ -185,7 +188,7 @@ export async function sendNoHaulerAlert(
     ]);
 
   await resendClient().emails.send({
-    from: FROM,
+    from: HAULER_FROM,
     to: ADMIN_EMAIL,
     subject: `⚠️ PAID ORDER, no hauler in range — ${order.delivery_zip}`,
     html: layout("Paid order with no hauler in range.", "Needs manual assignment", body),
