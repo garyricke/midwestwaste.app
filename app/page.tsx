@@ -25,9 +25,17 @@ export default async function Home() {
               MIDWEST WASTE
             </span>
           </span>
-          <span className="hidden sm:block text-sm text-white/70">
-            Family-owned · 30 years · Talk to a human
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="hidden md:block text-sm text-white/70">
+              Family-owned · 30 years
+            </span>
+            <a
+              href="tel:+16308008549"
+              className="whitespace-nowrap text-sm font-bold text-white hover:text-yellow"
+            >
+              📞 (630) 800-8549
+            </a>
+          </div>
         </div>
       </header>
 
@@ -60,8 +68,11 @@ export default async function Home() {
       </section>
 
       <footer className="mx-auto max-w-3xl px-5 py-8 text-sm text-foreground/60">
-        Family-owned · 30 years strong · Questions? Call us — a real person
-        answers.
+        Family-owned · 30 years strong · Questions? Call{" "}
+        <a href="tel:+16308008549" className="font-semibold text-navy hover:text-orange-deep">
+          (630) 800-8549
+        </a>{" "}
+        — a real person answers.
       </footer>
     </main>
   );

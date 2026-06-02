@@ -88,8 +88,10 @@ export default async function SuccessPage({
         </div>
 
         <p className="mt-6 text-sm text-foreground/60">
-          Family-owned · 30 years strong · Questions? Call us — a real person
-          answers.
+          Family-owned · 30 years strong · Questions? Call{" "}
+          <a href="tel:+16308008549" className="font-semibold text-navy hover:text-orange-deep">
+            (630) 800-8549
+          </a>
         </p>
       </section>
     </main>

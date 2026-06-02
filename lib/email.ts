@@ -56,7 +56,8 @@ function layout(preheader: string, heading: string, bodyHtml: string): string {
         </td></tr>
         <tr><td style="padding:18px 28px 26px;color:#8a93a3;font-size:12px;line-height:1.6;border-top:1px solid #eef0f4;">
           <strong style="color:#1B365D;">Midwest Waste</strong> · Dumpster Rental<br/>
-          Family-owned · 30 years strong · Sugar Grove &amp; Aurora, IL
+          Family-owned · 30 years strong · Sugar Grove &amp; Aurora, IL<br/>
+          <a href="tel:+16308008549" style="color:#1B365D;font-weight:700;text-decoration:none;">(630) 800-8549</a>
         </td></tr>
       </table>
     </td></tr>
