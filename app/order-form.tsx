@@ -1,21 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { DumpsterSize } from "@/lib/types";
 
-function dollars(cents: number) {
-  return `$${(cents / 100).toFixed(2)}`;
-}
-
-export default function OrderForm({
-  sizes,
-  selected,
-  onSelect,
-}: {
-  sizes: DumpsterSize[];
-  selected: string;
-  onSelect: (size: string) => void;
-}) {
+export default function OrderForm({ selected }: { selected: string }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,47 +32,8 @@ export default function OrderForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Size picker */}
-      <fieldset>
-        <legend className="font-display font-bold text-lg text-navy mb-3">
-          1 · Choose your size
-        </legend>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {sizes.map((s) => {
-            const active = selected === s.size;
-            return (
-              <label
-                key={s.size}
-                className={`cursor-pointer rounded-xl border-2 p-4 transition ${
-                  active
-                    ? "border-orange bg-orange/5"
-                    : "border-black/10 hover:border-navy/40"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="size"
-                  value={s.size}
-                  checked={active}
-                  onChange={() => onSelect(s.size)}
-                  className="sr-only"
-                />
-                <div className="flex items-baseline justify-between">
-                  <span className="font-display font-bold text-navy">
-                    {s.label}
-                  </span>
-                  <span className="font-display font-extrabold text-orange-deep">
-                    {dollars(s.price_cents)}
-                  </span>
-                </div>
-                <p className="mt-1 text-sm text-foreground/70">
-                  {s.description}
-                </p>
-              </label>
-            );
-          })}
-        </div>
-      </fieldset>
+      {/* Size is chosen in the hero above; carried here as the selected value. */}
+      <input type="hidden" name="size" value={selected} />
 
       {/* Delivery */}
       <fieldset>
@@ -96,7 +44,7 @@ export default function OrderForm({
           <Field name="delivery_address" label="Street address" required className="sm:col-span-2" />
           <Field name="delivery_city" label="City" />
           <div className="grid grid-cols-2 gap-3">
-            <Field name="delivery_state" label="State" maxLength={2} placeholder="WI" />
+            <Field name="delivery_state" label="State" maxLength={2} placeholder="IL" />
             <Field name="delivery_zip" label="ZIP" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5} />
           </div>
           <Field name="requested_delivery_date" label="Requested delivery date" type="date" className="sm:col-span-2" />
@@ -139,8 +87,7 @@ export default function OrderForm({
         {submitting ? "Taking you to checkout…" : "Continue to secure payment →"}
       </button>
       <p className="text-center text-xs text-foreground/50">
-        Payments are processed securely by Stripe. We never see your card
-        number.
+        Payments are processed securely by Stripe. We never see your card number.
       </p>
     </form>
   );

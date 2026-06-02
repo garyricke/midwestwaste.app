@@ -84,11 +84,14 @@ create table if not exists webhook_events (
 -- ---------------------------------------------------------------------------
 -- Seed dumpster sizes (demo pricing: $1 / $2 / $3 / $4)
 -- ---------------------------------------------------------------------------
-insert into dumpster_sizes (size, label, description, price_cents, sort_order) values
-  ('10yd', '10 Yard', 'Small cleanouts, a single room, or a modest yard project.', 100, 1),
-  ('15yd', '15 Yard', 'The sweet spot — garage cleanout or a small remodel.', 200, 2),
-  ('20yd', '20 Yard', 'Roofing tear-offs and larger renovation debris.', 300, 3),
-  ('30yd', '30 Yard', 'Full attic + garage, estate cleanouts, big builds.', 400, 4)
+insert into dumpster_sizes (size, label, description, price_cents, sort_order, active) values
+  ('10yd', '10 Yard', 'Small cleanouts, a single room, or a modest yard project.', 37500, 1, true),
+  ('15yd', '15 Yard', 'The sweet spot — garage cleanout or a small remodel.', 42500, 2, true),
+  ('20yd', '20 Yard', 'Roofing tear-offs and larger renovation debris.', 45000, 3, true),
+  ('30yd', '30 Yard', 'Full attic + garage, estate cleanouts, big builds.', 52500, 4, true),
+  -- Hidden $1 product for live-mode smoke testing. Keep inactive in production;
+  -- flip active=true to run a real-money test, then set it back to false.
+  ('smoke-test', 'Smoke Test ($1)', 'Internal live-mode payment test — keep inactive in production.', 100, 99, false)
 on conflict (size) do update set
   label = excluded.label,
   description = excluded.description,
