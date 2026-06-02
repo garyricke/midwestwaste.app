@@ -12,8 +12,37 @@ const HERO: Record<string, string> = {
   "30yd": "/hero/hero-30yd.jpg",
 };
 
+// Approx pickup-truck loads each size holds (from the roll-off size guide).
+const TRUCK_LOADS: Record<string, number> = {
+  "10yd": 4,
+  "15yd": 6,
+  "20yd": 8,
+  "30yd": 10,
+};
+
 function dollars(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
+}
+
+function TruckIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+      <path d="M15 18H9" />
+      <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+      <circle cx="17" cy="18" r="2" />
+      <circle cx="7" cy="18" r="2" />
+    </svg>
+  );
 }
 
 export default function OrderFlow({ sizes }: { sizes: DumpsterSize[] }) {
@@ -42,10 +71,25 @@ export default function OrderFlow({ sizes }: { sizes: DumpsterSize[] }) {
             you with a trusted local hauler. No phone tag, no quotes to chase.
           </p>
 
-          <fieldset className="mt-7">
-            <legend className="mb-3 font-display text-lg font-bold drop-shadow-sm">
-              1 · Choose your size
-            </legend>
+          <div className="mt-7">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+              <h2 className="font-display text-lg font-bold drop-shadow-sm">
+                1 · Choose your size
+              </h2>
+              <div
+                className="flex items-center gap-2"
+                aria-label={`Holds about ${TRUCK_LOADS[selected] ?? 4} pickup-truck loads`}
+              >
+                <div className="flex flex-wrap gap-1 text-yellow">
+                  {Array.from({ length: TRUCK_LOADS[selected] ?? 4 }).map((_, i) => (
+                    <TruckIcon key={i} />
+                  ))}
+                </div>
+                <span className="whitespace-nowrap text-sm font-semibold text-white/85">
+                  ≈ {TRUCK_LOADS[selected] ?? 4} truck loads
+                </span>
+              </div>
+            </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {sizes.map((s) => {
                 const active = selected === s.size;
@@ -72,7 +116,7 @@ export default function OrderFlow({ sizes }: { sizes: DumpsterSize[] }) {
                 );
               })}
             </div>
-          </fieldset>
+          </div>
         </div>
 
         {/* Preload the other sizes so the background swap is instant */}
