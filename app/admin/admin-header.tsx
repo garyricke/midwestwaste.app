@@ -1,4 +1,8 @@
-export default function AdminHeader({ active }: { active: "orders" | "haulers" }) {
+export default function AdminHeader({
+  active,
+}: {
+  active: "orders" | "haulers" | "docs";
+}) {
   const tabClass = (isActive: boolean) =>
     `rounded-lg px-3 py-1.5 text-sm font-semibold ${
       isActive ? "bg-white/15 text-white" : "text-white/70 hover:text-white"
@@ -25,6 +29,9 @@ export default function AdminHeader({ active }: { active: "orders" | "haulers" }
             </a>
             <a href="/admin/haulers" className={tabClass(active === "haulers")}>
               Haulers
+            </a>
+            <a href="/admin/docs" className={tabClass(active === "docs")}>
+              Docs
             </a>
           </nav>
         </div>
