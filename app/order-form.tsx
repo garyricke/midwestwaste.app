@@ -7,8 +7,15 @@ function dollars(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
-export default function OrderForm({ sizes }: { sizes: DumpsterSize[] }) {
-  const [selected, setSelected] = useState<string>(sizes[0]?.size ?? "");
+export default function OrderForm({
+  sizes,
+  selected,
+  onSelect,
+}: {
+  sizes: DumpsterSize[];
+  selected: string;
+  onSelect: (size: string) => void;
+}) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,7 +67,7 @@ export default function OrderForm({ sizes }: { sizes: DumpsterSize[] }) {
                   name="size"
                   value={s.size}
                   checked={active}
-                  onChange={() => setSelected(s.size)}
+                  onChange={() => onSelect(s.size)}
                   className="sr-only"
                 />
                 <div className="flex items-baseline justify-between">
